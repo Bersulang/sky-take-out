@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,14 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
         //1、从请求头中获取令牌
         String token = request.getHeader(jwtProperties.getAdminTokenName());
+
+        // 令牌为空直接拦截并响应401状态码
+        if (!StringUtils.hasLength(token)) {
+            log.info("令牌为空：{}, token");
+            response.setStatus(401);
+            return false;
+        }
+
 
         //2、校验令牌
         try {
