@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler
-    public Result sqlexceptionHandler(SQLIntegrityConstraintViolationException ex){
+    public Result exceptionHandler(SQLIntegrityConstraintViolationException ex){
         log.error("异常信息：{}", ex.getMessage());
         String message = ex.getMessage();
         if(message.contains("Duplicate entry")) {

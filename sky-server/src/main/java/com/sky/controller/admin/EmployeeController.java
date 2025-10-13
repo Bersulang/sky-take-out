@@ -91,6 +91,7 @@ public class EmployeeController {
      * @return
      */
     @GetMapping("/page")
+    @ApiOperation("员工列表分页查询")
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
         log.info("员工列表分页查询：{}", employeePageQueryDTO.getName());
         PageResult pageResult = employeeService.list(employeePageQueryDTO);
@@ -103,6 +104,7 @@ public class EmployeeController {
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation("根据ID查询员工")
     public Result<Employee> findById(@PathVariable Long id) {
         log.info("根据ID查询员工: {}", id);
         Employee employee = employeeService.findById(id);
@@ -129,6 +131,7 @@ public class EmployeeController {
      * @return
      */
     @PutMapping
+    @ApiOperation("修改员工信息")
     public Result update(@RequestBody EmployeeDTO employeeDTO) {
         log.info("修改员工信息：{}", employeeDTO);
         employeeService.update(employeeDTO);

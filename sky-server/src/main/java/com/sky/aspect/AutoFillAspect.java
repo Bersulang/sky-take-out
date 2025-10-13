@@ -56,6 +56,7 @@ public class AutoFillAspect {
         if(operationType == OperationType.INSERT){
             //为4个公共字段赋值
             try {
+                // 拿到需要赋值的属性的set方法
                 Method setCreateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_TIME, LocalDateTime.class);
                 Method setCreateUser = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_CREATE_USER, Long.class);
                 Method setUpdateTime = entity.getClass().getDeclaredMethod(AutoFillConstant.SET_UPDATE_TIME, LocalDateTime.class);
