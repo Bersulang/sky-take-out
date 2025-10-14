@@ -16,6 +16,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +43,10 @@ public class SetmealServiceImpl implements SetmealService {
      * @return
      */
     @Override
-    public PageResult list(SetmealPageQueryDTO setmealPageQueryDTO) {
+    public PageResult page(SetmealPageQueryDTO setmealPageQueryDTO) {
         PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
 
-        Page<SetmealVO> page = (Page<SetmealVO>) setmealMapper.list(setmealPageQueryDTO);
+        Page<SetmealVO> page = (Page<SetmealVO>) setmealMapper.page(setmealPageQueryDTO);
 
         return new PageResult(page.getTotal(), page.getResult());
     }
@@ -131,5 +132,25 @@ public class SetmealServiceImpl implements SetmealService {
 
             setmealDishMapper.insertBatch(setmealDishes);
         }
+    }
+
+
+    /**
+     * 条件查询
+     * @param setmeal
+     * @return
+     */
+    public List<Setmeal> list(Setmeal setmeal) {
+        List<Setmeal> list = setmealMapper.list(setmeal);
+        return list;
+    }
+
+    /**
+     * 根据id查询菜品选项
+     * @param id
+     * @return
+     */
+    public List<DishItemVO> getDishItemById(Long id) {
+        return setmealMapper.getDishItemBySetmealId(id);
     }
 }

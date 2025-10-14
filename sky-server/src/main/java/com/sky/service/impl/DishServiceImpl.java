@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,7 +72,7 @@ public class DishServiceImpl implements DishService {
     public PageResult list(DishPageQueryDTO dishPageQueryDTO) {
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
 
-        Page<DishVO> page = dishMapper.list(dishPageQueryDTO);
+        Page<DishVO> page = dishMapper.page(dishPageQueryDTO);
 
         return new PageResult(page.getTotal(), page.getResult());
     }
@@ -165,9 +166,29 @@ public class DishServiceImpl implements DishService {
         dishMapper.update(dish);
     }
 
-    @Override
-    public List<DishVO> getDishByCategoryId(Long categoryId) {
-        return dishMapper.getDishByCategoryId(categoryId);
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    public List<DishVO> listWithFlavor(Dish dish) {
+        List<Dish> dishList = dishMapper.list(dish);
+
+        List<DishVO> dishVOList = new ArrayList<>();
+
+        for (Dish d : dishList) {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(d,dishVO);
+
+            //根据菜品id查询对应的口味
+            List<DishFlavor> flavors = dishFlavorMapper.getByDishId(d.getId());
+
+            dishVO.setFlavors(flavors);
+            dishVOList.add(dishVO);
+        }
+
+        return dishVOList;
     }
 
 }

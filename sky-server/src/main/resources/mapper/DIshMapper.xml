@@ -7,7 +7,7 @@
         values (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser}, #{status})
     </insert>
 
-    <select id="list" resultType="com.sky.vo.DishVO">
+    <select id="page" resultType="com.sky.vo.DishVO">
         select d.*, c.name as categoryName from dish as d left join category as c on d.category_id = c.id
         <where>
             <if test="name != null and name != ''">

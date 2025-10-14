@@ -37,7 +37,7 @@ public interface DishMapper {
      * @param dishPageQueryDTO
      * @return
      */
-    Page<DishVO> list(DishPageQueryDTO dishPageQueryDTO);
+    Page<DishVO> page(DishPageQueryDTO dishPageQueryDTO);
 
     /**
      * 根据id查询菜品信息
@@ -63,9 +63,10 @@ public interface DishMapper {
 
     /**
      * 根据分类id查询菜品
-     * @param categoryId
+     * @param dish
      * @return
      */
     @Select("select * from dish where category_id = #{categoryId} and status = 1")
-    List<DishVO> getDishByCategoryId(Long categoryId);
+    List<Dish> list(Dish dish);
+
 }
