@@ -31,16 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(UserLoginDTO userLoginDTO) {
-        //首先调用微信接口获取openid
-        Map<String, String> param = new HashMap<>();
-        param.put("appid", weChatProperties.getAppid());
-        param.put("secret", weChatProperties.getSecret());
-        param.put("js_code", userLoginDTO.getCode());
-        param.put("grant_type", "authorization_code");
-        String json = HttpClientUtil.doGet(WECHAT_LOGIN_URL, param);
-
-        JSONObject jsonObject = JSON.parseObject(json);
-        String openid = jsonObject.getString("openid");
+        String openid = getOpenid(userLoginDTO.getCode());
 
         //如果获取到的openid为null，说明调用微信接口失败
         if (openid == null) {
@@ -62,6 +53,25 @@ public class UserServiceImpl implements UserService {
 
         return user;
 
+    }
 
+    /**
+     * 调用微信接口获取openid
+     * @param code
+     * @return
+     */
+    private String getOpenid(String code) {
+        //首先调用微信接口获取openid
+        Map<String, String> param = new HashMap<>();
+        param.put("appid", weChatProperties.getAppid());
+        param.put("secret", weChatProperties.getSecret());
+        param.put("js_code", code);
+        param.put("grant_type", "authorization_code");
+        String json = HttpClientUtil.doGet(WECHAT_LOGIN_URL, param);
+
+        JSONObject jsonObject = JSON.parseObject(json);
+        String openid = jsonObject.getString("openid");
+
+        return openid;
     }
 }
