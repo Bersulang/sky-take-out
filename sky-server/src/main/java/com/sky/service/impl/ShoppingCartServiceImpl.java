@@ -67,7 +67,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
     }
 
-    @Override
+
     public List<ShoppingCart> list() {
         ShoppingCart shoppingCart = ShoppingCart.builder()
                 .userId(BaseContext.getCurrentId())
@@ -75,11 +75,31 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartMapper.list(shoppingCart);
     }
 
-    @Override
+
     public void clean() {
         ShoppingCart shoppingCart = ShoppingCart.builder()
                 .userId(BaseContext.getCurrentId())
                 .build();
         shoppingCartMapper.clean(shoppingCart);
+    }
+
+
+    public void sub(ShoppingCartDTO shoppingCartDTO) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        shoppingCart.setUserId(BaseContext.getCurrentId());
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
+
+        // 加入逻辑验证，如果数量减到0，则从购物车中删除该商品
+        if (shoppingCartList != null && shoppingCartList.size() == 1) {
+            ShoppingCart cart = shoppingCartList.get(0);
+
+            if (cart.getNumber() > 1) {
+                cart.setNumber(cart.getNumber() - 1);
+                shoppingCartMapper.updateById(cart);
+            } else {
+                shoppingCartMapper.deleteOnce(shoppingCart);
+            }
+        }
     }
 }
