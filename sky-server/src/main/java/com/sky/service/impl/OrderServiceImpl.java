@@ -7,7 +7,6 @@ import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
-import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.service.OrderService;
@@ -41,8 +40,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     public OrderSubmitVO submit(OrdersSubmitDTO ordersSubmitDTO) {
+        //性能优化，先进行异常判断后进行逻辑处理，防止不必要开销
         Long userId = BaseContext.getCurrentId();
-
+        // 根据地址id去拿地址和收货人信息
+        AddressBook addressBook = addressBookMapper.getById(ordersSubmitDTO.getAddressBookId());
+        // 地址为空则抛异常
+        if (addressBook == null) {
+            throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
+        }
+        // 拿到当前购物车的菜品信息
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .userId(userId)
+                .build();
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
+        // 购物车为空，则抛异常
+        if (shoppingCartList == null) {
+            throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
+        }
         // 复制属性
         Orders order = new Orders();
         BeanUtils.copyProperties(ordersSubmitDTO,order);
@@ -53,40 +67,24 @@ public class OrderServiceImpl implements OrderService {
         order.setPayStatus(Orders.UN_PAID); // 未支付
         order.setNumber(String.valueOf(System.currentTimeMillis())); // 订单号
 
-        // 根据地址id去拿地址和收货人信息
-        AddressBook addressBook = addressBookMapper.getById(order.getAddressBookId());
-
         // 补全地址信息
-        if (addressBook != null) {
-            order.setConsignee(addressBook.getConsignee());
-            order.setPhone(addressBook.getPhone());
-            // 拼接地址信息
-            String address = addressBook.getProvinceName() + addressBook.getCityName()
-                    + addressBook.getDistrictName() + addressBook.getDetail();
-            order.setAddress(address);
-        } else {
-            throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
-        }
+        order.setConsignee(addressBook.getConsignee());
+        order.setPhone(addressBook.getPhone());
+        // 拼接地址信息
+        String address = addressBook.getProvinceName() + addressBook.getCityName()
+                + addressBook.getDistrictName() + addressBook.getDetail();
+        order.setAddress(address);
+        // 插入订单表
         orderMapper.insert(order);
 
-        // 拿到当前购物车的菜品信息
-        ShoppingCart shoppingCart = ShoppingCart.builder()
-                                                .userId(userId)
-                                                .build();
-        List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
-
-        if (shoppingCartList == null) {
-            throw new ShoppingCartBusinessException(MessageConstant.SHOPPING_CART_IS_NULL);
-        }
-
         List<OrderDetail> orderDetailList = new ArrayList<>();
-
         for (ShoppingCart cart : shoppingCartList) {
             OrderDetail orderDetail = new OrderDetail();
             BeanUtils.copyProperties(cart, orderDetail);
             orderDetail.setOrderId(order.getId());
             orderDetailList.add(orderDetail);
         }
+        // 批量插入订单明细表
         orderDetailMapper.insertBatch(orderDetailList);
 
         // 清空购物车
