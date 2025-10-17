@@ -45,4 +45,12 @@ public interface OrderMapper {
 
     @Select("select COUNT(*) from orders where status = #{status}")
     Integer getCountByStatus(Integer status);
+
+
+    @Select("select * from orders where pay_status = 0 and status = 1")
+    List<Orders> getNotPayOrders();
+
+
+    @Select("select * from orders where status = 4")
+    List<Orders> getDeliveringOrders();
 }
