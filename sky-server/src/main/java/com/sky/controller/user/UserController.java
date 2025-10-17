@@ -30,10 +30,11 @@ public class UserController {
     @Autowired
     private JwtProperties jwtProperties;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
+    /**
+     * 微信用户登录
+     * @param userLoginDTO
+     * @return
+     */
     @PostMapping("/login")
     public Result<UserLoginVO> userLogin(@RequestBody UserLoginDTO userLoginDTO) {
         log.info("微信用户登录");

@@ -68,6 +68,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
 
+    /**
+     * 查看购物车
+     * @return
+     */
     public List<ShoppingCart> list() {
         ShoppingCart shoppingCart = ShoppingCart.builder()
                 .userId(BaseContext.getCurrentId())
@@ -76,6 +80,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
 
+    /**
+     * 清空购物车
+     */
     public void clean() {
         ShoppingCart shoppingCart = ShoppingCart.builder()
                 .userId(BaseContext.getCurrentId())
@@ -84,6 +91,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
 
+    /**
+     * 购物车数量减少
+     * @param shoppingCartDTO
+     */
     public void sub(ShoppingCartDTO shoppingCartDTO) {
         ShoppingCart shoppingCart = new ShoppingCart();
         BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
