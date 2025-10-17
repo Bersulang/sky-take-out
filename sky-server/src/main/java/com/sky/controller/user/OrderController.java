@@ -9,11 +9,14 @@ import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.lang.invoke.StringConcatFactory;
 
 @RestController("userOrderController")
 @RequestMapping("/user/order")
@@ -22,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
     @Autowired
     private OrderService orderService;
-
     /**
      * 提交订单
      * @param ordersSubmitDTO
@@ -101,6 +103,16 @@ public class OrderController {
     public Result<String> repetition(@PathVariable Long id) {
         log.info("再来一单：{}", id);
         orderService.repetition(id);
+        return Result.success();
+    }
+
+
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("用户催单")
+    public Result<String> reminder(@PathVariable Long id) {
+        log.info("用户催单：{}", id);
+        //在servervice层通过websocket发送消息到商家端-浏览器
+        orderService.reminder(id);
         return Result.success();
     }
 }

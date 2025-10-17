@@ -18,6 +18,10 @@ public class OrderTask {
     @Autowired
     private OrderMapper orderMapper;
 
+    /**
+     * 处理超时未支付订单
+     * 每分钟的第一秒执行一次
+     */
     @Scheduled(cron = "1 * * * * ?")
     public void processOrderTimeOut() {
         log.info("处理支付超时订单...");
@@ -26,11 +30,16 @@ public class OrderTask {
             if (order.getOrderTime().plusMinutes(15).isBefore(LocalDateTime.now())) {
                 order.setStatus(Orders.CANCELLED);
                 order.setCancelReason(MessageConstant.PAY_TIMEOUT);
+                order.setCancelTime(LocalDateTime.now());
                 orderMapper.update(order);
             }
         }
     }
 
+    /**
+     * 将前一天的派送中订单改为完成
+     * 每天凌晨1点执行一次
+     */
     @Scheduled(cron = "* * 1 * * ?")
     public void processOrderDelivery() {
         log.info("处理派送超时订单");
