@@ -57,11 +57,26 @@ public interface OrderMapper {
     List<Orders> getDeliveringOrders();
 
 
+    /**
+     * 营业额统计
+     * @param map
+     * @return
+     */
     Double getTurnover(Map map);
 
 
+    /**
+     * 订单数量统计
+     * @param map
+     * @return
+     */
     Integer orderCountByMap(Map map);
 
 
+    /**
+     * 销售榜单
+     * @param map
+     * @return
+     */
     List<GoodsSalesDTO> getTop10(Map map);
 }
