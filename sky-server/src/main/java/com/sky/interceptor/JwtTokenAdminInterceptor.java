@@ -45,7 +45,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
         // 令牌为空直接拦截并响应401状态码
         if (!StringUtils.hasLength(token)) {
-            log.info("令牌为空：{}, token");
+            log.info("令牌为空：{}", token);
             response.setStatus(401);
             return false;
         }
